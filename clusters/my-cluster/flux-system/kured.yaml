@@ -1,13 +1,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: kured-1
+  name: kured
   namespace: kube-system
 spec:
-  releaseName: kured-1
+  releaseName: kured
   chart:
-    git: https://github.com/harryvinod/kured_helper
-    path: kured
-    ref: main
+    spec:
+      sourceRef:
+        kind: GitRepository
+        name: kured-repo
+      path: kured
+      ref: main
   values:
-    fullnameOverride: kured-1
+    fullnameOverride: kured
