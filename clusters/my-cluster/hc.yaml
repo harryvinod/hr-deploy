@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmChart
+metadata:
+  name: kube-system-kured
+  namespace: kube-system
+spec:
+  interval: 5m0s
+  chart: kured
+  reconcileStrategy: ChartVersion
+  sourceRef:
+    kind: HelmRepository
+    name: kured-repo
+  version: '5.4.5'
