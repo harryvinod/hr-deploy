@@ -17,6 +17,8 @@ spec:
   releaseName: kured
   values:
     fullnameOverride: kured
+  imagePullSecrets:
+    - name: regcred
   postRenderers:
     - kustomize:
         patches:
