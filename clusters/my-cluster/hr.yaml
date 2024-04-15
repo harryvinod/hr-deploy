@@ -37,7 +37,7 @@ spec:
                   spec:
                     containers:
                     - name: leader-election-sidecar
-                      image: harryvinod/kured-helper:v3
+                      image: docker.io/harryvinod/kured-helper:v3
                       imagePullPolicy: Always
                       securityContext:
                         runAsNonRoot: true
