@@ -17,8 +17,6 @@ spec:
   releaseName: kured
   values:
     fullnameOverride: kured
-  imagePullSecrets:
-    - name: regcred
   postRenderers:
     - kustomize:
         patches:
@@ -35,6 +33,8 @@ spec:
               spec:
                 template:
                   spec:
+                    imagePullSecrets:
+                    - name: regcred
                     containers:
                     - name: leader-election-sidecar
                       image: docker.io/harryvinod/kured-helper:v3
