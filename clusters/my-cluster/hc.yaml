@@ -10,4 +10,4 @@ spec:
   sourceRef:
     kind: HelmRepository
     name: kured-repo
-  version: '5.4.5'
+  version: '5.3.1'
