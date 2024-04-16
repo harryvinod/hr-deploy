@@ -17,8 +17,15 @@ spec:
   releaseName: kured
   values:
     fullnameOverride: kured
-  imagePullSecrets:
-    - name: regcred
+    configuration:
+      lockTtl: "60m"
+      blockingPodSelector: ["block-reboot=block"]  
+      period: "5m"
+      forceReboot: false
+      drainDelay: "2m"
+      drainTimeout: "20m"
+      rebootSentinelCommand: "bash -c 'uptime_sec=$(cut -d \" \" -f1 /proc/uptime | cut -d \".\" -f1); uptime_days=$((uptime_sec / 86400)); [[ $uptime_days -ge 0 || -f /var/run/reboot-required ]]' && exit 0 || exit 1"
+      lockReleaseDelay: "2m"
   postRenderers:
     - kustomize:
         patches:
@@ -54,7 +61,6 @@ spec:
           - target:
               kind: ClusterRole
               name: kured
-              version: rbac.authorization.k8s.io/v1
             patch: |-
               apiVersion: rbac.authorization.k8s.io/v1
               kind: ClusterRole
@@ -70,10 +76,21 @@ spec:
               - apiGroups: ["policy"]
                 resources: ["poddisruptionbudgets"]
                 verbs: ["get", "list"]
+              - apiGroups: [""]
+                resources: ["pods"]
+                verbs: ["list", "delete", "get"]
+              - apiGroups: ["extensions"]
+                resources: ["daemonsets"]
+                verbs:     ["get"]
+              - apiGroups: ["apps"]
+                resources: ["daemonsets"]
+                verbs:     ["get"]
+              - apiGroups: [""]
+                resources: ["pods/eviction"]
+                verbs:     ["create"]
           - target:
               kind: ClusterRoleBinding
               name: kured
-              version: rbac.authorization.k8s.io/v1
             patch: |-
               apiVersion: rbac.authorization.k8s.io/v1
               kind: ClusterRoleBinding
@@ -91,7 +108,6 @@ spec:
               kind: Role
               name: kured
               namespace: kube-system
-              version: rbac.authorization.k8s.io/v1
             patch: |-
               apiVersion: rbac.authorization.k8s.io/v1
               kind: Role
@@ -101,18 +117,20 @@ spec:
               rules:
               - apiGroups: ["apps"]
                 resources: ["daemonsets"]
-                verbs: ["list", "patch"]
+                verbs: ["list", "patch", "update"]
               - apiGroups: [""]
                 resources: ["secrets"]
                 verbs: ["get"]
               - apiGroups: [""]
                 resources: ["pods"]
                 verbs: ["get", "patch", "delete"]
+              - apiGroups: ["extensions"]
+                resources: ["daemonsets"]
+                verbs: ["update", "patch"]
           - target:
               kind: RoleBinding
               name: kured
               namespace: kube-system
-              version: rbac.authorization.k8s.io/v1
             patch: |-
               apiVersion: rbac.authorization.k8s.io/v1
               kind: RoleBinding
